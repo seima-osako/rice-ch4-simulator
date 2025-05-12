@@ -1,0 +1,17 @@
+[project]
+name = "rice-ch4-simulator"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "folium>=0.19.5",
+    "geopandas>=1.0.1",
+    "h5netcdf>=1.6.1",
+    "netcdf4>=1.7.2",
+    "pandas>=2.2.3",
+    "plotly>=6.0.1",
+    "streamlit>=1.45.0",
+    "streamlit-folium>=0.25.0",
+    "xarray>=2025.4.0",
+]
