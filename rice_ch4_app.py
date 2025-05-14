@@ -19,7 +19,6 @@ st.set_page_config(
     layout="wide",
 )
 # ------------ Sidebar Tabs ------------
-# サイドバーのウィジェットラベルとラジオボタン選択肢を白に、他は適切に設定するCSS (ラジオボタン選択肢のセレクタ強化)
 st.markdown(
     """
     <style>
@@ -58,8 +57,9 @@ with st.sidebar:
         tabName=["Home", "Map"], iconName=["home", "map"], default_choice=0
     )
 if tab == "Home":
-    st.title("Home")
-    st.write("Hello world!")
+    with open("markdown/home_content.md", encoding="utf-8") as f:
+        home_md = f.read()
+    st.markdown(home_md)
 elif tab == "Map":
     # ------------ File paths and range ------------
     NC_PATH = "./data/inten_phsc_2021.nc"
