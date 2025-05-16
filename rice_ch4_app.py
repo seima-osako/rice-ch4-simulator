@@ -319,7 +319,7 @@ elif tab == "Map":
                 vmax += 0.01
             cmap = linear.YlGnBu_09.scale(vmin, vmax).to_step(9)
             cmap.colors = cmap.colors[::-1]
-            cmap.caption = "Rice Physical Area (ha)"
+            cmap.caption = "Rice Area (ha)"
 
             # Map centroid & zoom
             current_pref_for_map = st.session_state.sel_pref
@@ -403,8 +403,13 @@ elif tab == "Map":
                     sel_df = gdf_clip[gdf_clip.geometry.contains(pt)]
                     if not sel_df.empty:
                         row = sel_df.iloc[0]
-                        st.session_state.sel_uid = str(row.uid)
-                        st.session_state.sel_area = float(row.area)
+                        new_uid = str(row.uid)
+                        new_area = float(row.area)
+                        # Reset calculation result if a different polygon is selected
+                        if new_uid != st.session_state.get("sel_uid"):
+                            st.session_state.out = None
+                        st.session_state.sel_uid = new_uid
+                        st.session_state.sel_area = new_area
                         centroid = row.geometry.centroid
                         st.session_state.map_center = [centroid.y, centroid.x]
                         st.session_state.map_zoom = 12
