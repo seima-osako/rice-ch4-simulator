@@ -116,10 +116,10 @@ elif tab == "Map":
 
     def compute_ch4(
         area_ha: float,
-        prefecture: str,  # pref -> prefecture
-        drainage_class: str,  # drainage -> drainage_class
-        straw_removal_kg_10a: float,  # straw_kg -> straw_removal_kg_10a
-        compost_rate: float,  # comp -> compost_rate
+        prefecture: str,
+        drainage_class: str,
+        straw_removal_kg_10a: float,
+        compost_rate: float,
     ):
         try:
             region = PREF_TO_REGION[prefecture]
@@ -146,7 +146,7 @@ elif tab == "Map":
         manure_coeff = coeffs["manure"]
         no_straw_coeff = coeffs["no_straw"]
 
-        coeff_val = min(  # coeff -> coeff_val (for distinction)
+        coeff_val = min(
             max(straw_coeff, manure_coeff),
             no_straw_coeff
             + (straw_coeff - no_straw_coeff) * incorporation_rate
@@ -154,9 +154,8 @@ elif tab == "Map":
         )
 
         GWP_CH4 = 28
-        conv_factor = 16 / 12 * GWP_CH4 * 1e-3  # conv -> conv_factor
+        conv_factor = 16 / 12 * GWP_CH4 * 1e-3
 
-        # Match rice_ch4_app.py logic
         coeff_baseline = coeff_val
         coeff_project = coeff_val * 0.7
         baseline_emission = area_ha * coeff_baseline * conv_factor
@@ -201,7 +200,6 @@ elif tab == "Map":
 
     # ------------ Sidebar UI ------------
 
-    # Language selector
     st.sidebar.selectbox(
         "Language / 言語",
         {"日本語": "ja", "English": "en"},
@@ -235,7 +233,6 @@ elif tab == "Map":
 
     sel_drain = st.sidebar.selectbox(t("drainage_class"), DRAINAGE_CLASSES, index=2)
     sel_straw = st.sidebar.number_input(t("straw_removal"), 0.0, 2000.0, 0.0, 10.0)
-    # sel_comp = st.sidebar.slider(t("compost_rate"), 0.0, 1.0, 0.5, 0.01)
     sel_comp = 0.5
 
     if st.session_state.sel_area:
@@ -268,7 +265,6 @@ elif tab == "Map":
         st.warning(t("no_selection"))
     elif st.session_state.out:
         c1, c2, c3 = st.columns(3)
-        # Adjusted display due to change in compute_ch4 return key names
         c1.metric("Project (t‑CO₂)", st.session_state.out["project_emission_tCO2"])
         c2.metric("Baseline (t‑CO₂)", st.session_state.out["baseline_emission_tCO2"])
         c3.metric("Reduction (t‑CO₂)", st.session_state.out["emission_reduction_tCO2"])
@@ -279,29 +275,41 @@ elif tab == "Map":
         selected_pref_name = st.session_state.sel_pref
         sel_poly = gdf_pref.loc[gdf_pref.name == selected_pref_name, "geometry"].iloc[0]
 
-        # NetCDF → DataFrame → bounding box polygons
-        cells = da.to_dataframe("area").reset_index()
-        dlat = abs(float(da.lat[1] - da.lat[0]))
-        dlon = abs(float(da.lon[1] - da.lon[0]))
-        boxes = [
-            box(
-                r.lon - dlon / 2,
-                r.lat - dlat / 2,
-                r.lon + dlon / 2,
-                r.lat + dlat / 2,
-            )
-            for r in cells.itertuples()
-        ]
+        # Extract only bbox of the prefecture from NetCDF
+        @st.cache_data
+        def grid_for_pref(pref_name: str) -> gpd.GeoDataFrame:
+            poly = gdf_pref.loc[gdf_pref.name == pref_name, "geometry"].iloc[0]
+            minx, miny, maxx, maxy = poly.bounds
+            # Check lat axis direction
+            lat_desc = float(da.lat[0]) > float(da.lat[-1])
+            lat_slice = slice(maxy, miny) if lat_desc else slice(miny, maxy)
+            sub = da.sel(lat=lat_slice, lon=slice(minx, maxx))
+            if sub.size == 0:
+                return gpd.GeoDataFrame(columns=["area", "lat", "lon", "geometry"])
+            dlat = abs(float(sub.lat[1] - sub.lat[0]))
+            dlon = abs(float(sub.lon[1] - sub.lon[0]))
+            df = sub.to_dataframe("area").reset_index()
+            # Remove rows where area is NaN
+            df = df.dropna(subset=["area"])
+            boxes = [
+                box(
+                    r.lon - dlon / 2,
+                    r.lat - dlat / 2,
+                    r.lon + dlon / 2,
+                    r.lat + dlat / 2,
+                )
+                for r in df.itertuples()
+            ]
+            gdf = gpd.GeoDataFrame(df, geometry=boxes, crs=4326)
+            gdf = gdf[(gdf.area > 0) & (gdf.geometry.within(poly))]
+            return gdf
 
-        gdf_cells = gpd.GeoDataFrame(cells, geometry=boxes, crs="EPSG:4326", copy=False)
-        condition_within_sel_poly = gdf_cells.geometry.within(sel_poly)
-        condition_has_area = gdf_cells["area"] > 0
-        gdf_clip = gdf_cells[condition_within_sel_poly & condition_has_area]
+        gdf_clip = grid_for_pref(st.session_state.sel_pref)
 
         if gdf_clip.empty:
             st.warning(t("no_map_data_warning", pref_name=selected_pref_name))
         else:
-            gdf_clip = gdf_clip.copy()  # To avoid SettingWithCopyWarning
+            gdf_clip = gdf_clip.copy()
             gdf_clip["uid"] = gdf_clip.index.astype(str)
 
             # Color map
@@ -344,10 +352,17 @@ elif tab == "Map":
 
             def style_fn(feat):
                 props = feat["properties"]
-                uid, area = str(props["uid"]), props["area"]
+                uid = str(props.get("uid"))
+                area = props.get("area")
                 sel = uid == str(st.session_state.sel_uid)
+                fill_color = "#cccccc"
+                try:
+                    if area is not None:
+                        fill_color = cmap(area)
+                except Exception:
+                    fill_color = "#cccccc"
                 return {
-                    "fillColor": cmap(area),
+                    "fillColor": fill_color,
                     "fillOpacity": 0.4,
                     "color": "red" if sel else "transparent",
                     "weight": 2 if sel else 0,
@@ -363,7 +378,7 @@ elif tab == "Map":
             ).add_to(m)
 
             GeoJson(
-                sel_poly,  # Use sel_poly
+                sel_poly,
                 style_function=lambda _: {
                     "color": "black",
                     "weight": 2,
