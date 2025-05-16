@@ -142,3 +142,6 @@ lerna-debug.log*
 # uv
 .uv
 uv.lock
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
