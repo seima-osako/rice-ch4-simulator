@@ -32,6 +32,7 @@ This project is an application that simulates methane (CH4) emissions from rice 
     - How to obtain: [Data download link](https://figshare.com/articles/dataset/GloRice_I_Gridded_5-arcmin_paddy_rice_annual_distribution_maps_for_the_years_1961_to_2021/27965832/2)
 - **`data/prefectures.geojson`**:
     - Content: Polygon data showing the boundaries of prefectures in Japan.
+    - How to obtain: [Data download link](https://japonyol.net/editor/article/47-prefectures-geojson.html)
 
 ## How to Run Locally
 1.  **Install the required libraries:**
@@ -63,8 +64,6 @@ You can deploy the application on AWS using Terraform.
     # Apply the configuration to create resources
     terraform apply
     ```
-    ```
-    Enter `yes` to approve, and resources like EC2 instances will be created.
 6.  **Verify deployment:**
     Access the public IP address of the EC2 instance (port 8501) displayed in the Terraform output in your browser.
     Example: `http://YOUR_EC2_PUBLIC_IP:8501`
