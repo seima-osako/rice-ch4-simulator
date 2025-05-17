@@ -2,7 +2,14 @@
 
 ## Overview
 
-This project is an application that simulates methane (CH4) emissions from rice paddies.
+This application allows you to easily estimate the potential reduction in methane emissions from rice paddies by extending mid-season drainage in Japan
+
+- Select a rice paddy polygon from the map
+- Enter parameters and calculate
+- View results in the sidebar and main screen
+
+
+![Rice CH4 Simulator application interface](static/demo.png)
 
 ## Directory Structure
 
