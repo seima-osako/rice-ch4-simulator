@@ -59,7 +59,7 @@ with st.sidebar:
 if tab == "Home":
     with open("markdown/home_content.md", encoding="utf-8") as f:
         home_md = f.read()
-    st.markdown(home_md)
+    st.markdown(home_md, unsafe_allow_html=True)
 elif tab == "Map":
     # ------------ File paths and range ------------
     NC_PATH = "./data/inten_phsc_2021.nc"

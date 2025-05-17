@@ -1,9 +1,12 @@
-# Rice Paddy CH₄ Emission Simulation
+# Extension of Mid‐Season Drainage in Paddy Rice Cultivation
+#### *under the J-Credit Scheme's agricultural methodology*
 
-This application allows you to easily estimate the potential reduction in methane emissions from rice paddies by extending mid-season drainage in Japan
+## What is the J-Credit Scheme?
+The J-Credit Scheme certifies and makes tradeable the difference between:
 
-- Select a rice paddy polygon from the map
-- Enter parameters and calculate
-- View results in the sidebar and main screen
+1. The amount of greenhouse gas emissions that would have occurred without any reduction activities (the baseline), and
+2. The actual emissions after implementing reduction or absorption activities.
 
-Thank you for using this tool.
+That difference, which is measured in tons of CO₂ equivalent, is issued as a credit. Credits can come from reduced emissions or from carbon absorption through activities.
+
+<img src="./app/static/concept_of_baseline_and_credit.png">
