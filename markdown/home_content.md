@@ -9,4 +9,4 @@ The J-Credit Scheme certifies and makes tradeable the difference between:
 
 That difference, which is measured in tons of CO₂ equivalent, is issued as a credit. Credits can come from reduced emissions or from carbon absorption through activities.
 
-<img src="./app/static/concept_of_baseline_and_credit.png">
+<img src="app/static/concept_of_baseline_and_credit.png">

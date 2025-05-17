@@ -15,17 +15,22 @@ This application allows you to easily estimate the potential reduction in methan
 
 ```
 .
+├── .gitignore
+├── .streamlit/
+│   └── config.toml         # Streamlit configuration file
+├── .terraform.lock.hcl
 ├── data/
 │   ├── inten_phsc_2021.nc  # GloRice-phsc Intensive rice physical area maps
 │   └── prefectures.geojson # Polygon data for prefectures in Japan
+├── img/                    # Directory for general image assets (if any)
 ├── markdown/
 │   └── home_content.md     # Homepage content for the application
-├── .gitignore
 ├── main.tf                 # Terraform configuration file (infrastructure definition)
 ├── pyproject.toml          # Python project configuration file
 ├── README.md               # This file
 ├── rice_ch4_app.py         # Main Streamlit application
 ├── rice_ch4_params.py      # Simulation parameter definitions
+├── static/                 # Directory for static assets (e.g., images used in the app)
 ├── style.css               # Stylesheet for the application
 ├── user_data.sh            # EC2 instance user data script
 └── variables.tf            # Terraform variable definitions file
