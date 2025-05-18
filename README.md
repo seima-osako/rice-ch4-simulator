@@ -22,7 +22,6 @@ This application allows you to easily estimate the potential reduction in methan
 ├── data/
 │   ├── inten_phsc_2021.nc  # GloRice-phsc Intensive rice physical area maps
 │   └── prefectures.geojson # Polygon data for prefectures in Japan
-├── img/                    # Directory for general image assets (if any)
 ├── markdown/
 │   └── home_content.md     # Homepage content for the application
 ├── main.tf                 # Terraform configuration file (infrastructure definition)
