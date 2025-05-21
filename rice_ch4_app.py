@@ -301,7 +301,7 @@ elif tab == "Map":
                 for r in df.itertuples()
             ]
             gdf = gpd.GeoDataFrame(df, geometry=boxes, crs=4326)
-            gdf = gdf[(gdf.area > 0) & (gdf.geometry.within(poly))]
+            gdf = gdf[(gdf["area"] > 0) & (gdf.geometry.within(poly))]
             return gdf
 
         gdf_clip = grid_for_pref(st.session_state.sel_pref)
